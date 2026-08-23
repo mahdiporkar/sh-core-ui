@@ -1,0 +1,83 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Documentation/Getting started" />
+
+# Getting started
+
+`sh-core-ui` is a vendor-neutral React platform. Applications consume stable `SH*` contracts;
+Ant Design and AG Grid Enterprise remain implementation details inside adapters.
+
+## 1. Install
+
+```bash
+npm install sh-core-ui react react-dom antd ag-grid-community ag-grid-react ag-grid-enterprise
+```
+
+Import the package stylesheet once at the application entry point:
+
+```tsx
+import 'sh-core-ui/styles.css';
+```
+
+## 2. Mount the application providers
+
+The backend or authorization engine returns an evaluated **Effective Manifest** for the current
+identity and context. Inject that object at the application boundary.
+
+```tsx
+import { SHCoreProvider, SHNotification } from 'sh-core-ui/components';
+import { SHGridProvider } from 'sh-core-ui/grid';
+
+const manifest = await authorizationClient.getEffectiveManifest();
+
+root.render(
+  <SHCoreProvider manifest={manifest} manifestLoading={false}>
+    <SHNotification>
+      <SHGridProvider enterpriseFeatures={['serverSideRows']}>
+        <App />
+      </SHGridProvider>
+    </SHNotification>
+  </SHCoreProvider>,
+);
+```
+
+Only enable Enterprise Grid modules actually used by the application. Supply the AG Grid licence
+through deployment configuration, not source control.
+
+## 3. Bind UI to decisions
+
+```tsx
+<SHButton policy={{ resource: 'orders', action: 'create' }}>Create order</SHButton>
+```
+
+The binding is only a lookup key. It does not contain roles or business rules. When the matching
+decision is denied, `ui.deniedBehavior` determines whether the component is hidden, disabled, or
+read-only.
+
+## 4. Notify from a service
+
+After one `SHNotification` host is mounted, non-React modules can use the global vendor-neutral
+facade:
+
+```ts
+import { SHNotify } from 'sh-core-ui/components';
+
+export async function saveRecord(input: SaveInput) {
+  try {
+    return await api.save(input);
+  } catch (error) {
+    SHNotify.error({
+      title: 'Save failed',
+      description: 'Try again or contact support.',
+      role: 'alert',
+    });
+    throw error;
+  }
+}
+```
+
+## Security boundary
+
+The Manifest changes presentation only. Every protected backend operation must independently
+authorize the request. Unauthorized fields and rows must be removed before serialization; hiding a
+button or column is never a security control.

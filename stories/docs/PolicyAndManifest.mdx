@@ -1,0 +1,108 @@
+import { Meta, Canvas } from '@storybook/blocks';
+import * as ButtonStories from '../Button.stories';
+import * as InputStories from '../Input.stories';
+
+<Meta title="Documentation/Manifest and policy" />
+
+# Manifest and policy
+
+## Definition versus Effective Manifest
+
+The **Definition Manifest** is maintained with the application and declares available resources,
+actions, and routes. It contains no user grants. The **Effective Manifest** is evaluated by the
+backend or authorization engine for one user/session and is the only Manifest injected into
+`SHCoreProvider`.
+
+```ts
+const effectiveManifest = {
+  schemaVersion: '1.0',
+  version: '2026-08-24.1',
+  issuedAt: '2026-08-24T08:00:00.000Z',
+  expiresAt: '2026-08-24T08:15:00.000Z',
+  decisions: [
+    {
+      resource: 'orders',
+      action: 'create',
+      allowed: false,
+      ui: {
+        deniedBehavior: 'disable',
+        reasonCode: 'APPROVAL_REQUIRED',
+      },
+    },
+  ],
+};
+```
+
+```tsx
+<SHCoreProvider manifest={effectiveManifest}>
+  <Application />
+</SHCoreProvider>
+```
+
+Do not evaluate roles in components. The backend resolves roles, claims, tenant context, ownership,
+and business rules before returning decisions.
+
+## Component binding
+
+```tsx
+<SHButton policy={{ resource: 'orders', action: 'create' }}>
+  Create
+</SHButton>
+
+<SHInput policy={{ resource: 'orders', action: 'edit' }} label="Reference" />
+```
+
+The pair `resource + action` must exactly match one Effective Manifest decision.
+
+| Manifest state               | Result                                                    |
+| ---------------------------- | --------------------------------------------------------- |
+| `allowed: true`              | Normal component behavior                                 |
+| denied + `hide`              | Component is not rendered                                 |
+| denied + `disable`           | Interactive component is disabled                         |
+| denied + `readOnly`          | Data-entry component is read-only; actions cannot execute |
+| missing Manifest or decision | Fail closed; component is disabled                        |
+| expired Manifest             | Fail closed; component is disabled                        |
+| `manifestLoading`            | Uses `pendingBehavior`, otherwise disabled                |
+
+Use the **lock toolbar** above the preview to switch between `allowed`, `hide`, `disable`,
+`readOnly`, `missing`, and `expired` and observe the same story under each state.
+
+## Live button policy
+
+<Canvas of={ButtonStories.PolicyAware} />
+
+## Live input policy
+
+<Canvas of={InputStories.PolicyAware} />
+
+## Conditional content and routes
+
+Use `SHCan` for fragments and `SHRouteGuard` for route boundaries:
+
+```tsx
+<SHCan policy={{ resource: 'reports', action: 'view' }} fallback={null}>
+  <ReportsNavigationItem />
+</SHCan>
+
+<SHRouteGuard
+  policy={{ resource: 'reports', action: 'view' }}
+  loadingFallback={<PageSkeleton />}
+  fallback={<SHAccessDenied />}
+>
+  <ReportsPage />
+</SHRouteGuard>
+```
+
+## Fetch lifecycle
+
+1. Start with `manifestLoading={true}`.
+2. Fetch the Effective Manifest from a trusted backend endpoint.
+3. Validate its schema and expiry.
+4. Inject it into `SHCoreProvider` and set loading to false.
+5. Refresh according to `cache.refreshAfter`, session changes, or authorization events.
+6. Treat missing, invalid, and expired data as denied.
+
+## Security rule
+
+Policy-aware UI prevents misleading or unusable controls; it does not protect data. The backend or
+gateway must authorize every request and filter unauthorized rows and fields.

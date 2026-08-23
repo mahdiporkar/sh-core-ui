@@ -1,6 +1,6 @@
 import type { StorybookConfig } from '@storybook/react-webpack5';
 const config: StorybookConfig = {
-  stories: ['../stories/**/*.stories.@(ts|tsx)'],
+  stories: ['../stories/**/*.mdx', '../stories/**/*.stories.@(ts|tsx)'],
   addons: ['@storybook/addon-essentials', '@storybook/addon-a11y', '@storybook/addon-interactions'],
   framework: { name: '@storybook/react-webpack5', options: {} },
   docs: { autodocs: 'tag' },

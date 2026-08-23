@@ -1,0 +1,126 @@
+import { Meta, Canvas } from '@storybook/blocks';
+import * as GridStories from '../Grid.stories';
+
+<Meta title="Documentation/SHGrid guide" />
+
+# SHGrid guide
+
+`SHGrid<T>` is the stable, generic API for high-volume enterprise data. Public consumers work with
+`SHGridColumn`, `SHGridDataSource`, and `SHGridRef`; AG Grid types do not cross the package boundary.
+
+## Client-side grid
+
+Use `rows` when the complete data set is already available.
+
+```tsx
+interface RecordRow {
+  id: string;
+  title: string;
+  score: number;
+}
+
+const columns: readonly SHGridColumn<RecordRow>[] = [
+  { id: 'id', header: 'ID', value: 'id', pinned: 'start' },
+  { id: 'title', header: 'Title', value: 'title', sortable: true, filterable: true },
+  { id: 'score', header: 'Score', value: 'score', sortable: true },
+];
+
+<SHGridProvider>
+  <SHGrid columns={columns} rows={rows} rowId="id" selectable pageSize={20} />
+</SHGridProvider>;
+```
+
+<Canvas of={GridStories.ClientSide} />
+
+## Server-side grid
+
+Enable only the required Enterprise module and set `dataMode="server"`. The adapter translates AG
+Grid requests into the vendor-neutral `SHGridQuery` contract.
+
+```tsx
+const dataSource: SHGridDataSource<RecordRow> = {
+  async load(query, signal) {
+    const search = new URLSearchParams({
+      offset: String(query.offset),
+      limit: String(query.limit),
+      sort: JSON.stringify(query.sort),
+      filters: JSON.stringify(query.filters),
+    });
+    const response = await fetch(`/api/records?${search}`, { signal });
+    if (!response.ok) throw new Error('Unable to load records');
+    return response.json() as Promise<SHGridResult<RecordRow>>;
+  },
+};
+
+<SHGridProvider enterpriseFeatures={['serverSideRows']} licenseKey={runtimeLicenseKey}>
+  <SHGrid
+    columns={columns}
+    dataSource={dataSource}
+    dataMode="server"
+    rowId="id"
+    pageSize={50}
+    pageSizeOptions={[20, 50, 100]}
+  />
+</SHGridProvider>;
+```
+
+`query` contains `offset`, `limit`, `sort`, `filters`, and optional grouping identifiers. Respect the
+provided `AbortSignal`, and return `{ rows, total }`.
+
+<Canvas of={GridStories.ServerDataSource} />
+
+## Loading, empty, and error states
+
+- `loadingContent` replaces the default loading presentation.
+- `emptyContent` is shown when a client-side result has no rows.
+- `errorContent(error, retry)` supplies an application-owned recovery UI.
+- `onError` reports failures to monitoring without coupling the grid to a logging vendor.
+
+<Canvas of={GridStories.Empty} />
+
+<Canvas of={GridStories.ErrorAndRetry} />
+
+## Selection and imperative operations
+
+```tsx
+const gridRef = useRef<SHGridRef>(null);
+
+<SHGrid
+  ref={gridRef}
+  columns={columns}
+  rows={rows}
+  rowId="id"
+  selectable
+  onSelectionChange={(selectedRows) => setSelected(selectedRows)}
+/>;
+
+gridRef.current?.clearSelection();
+gridRef.current?.refresh();
+gridRef.current?.export({ format: 'csv', selectedOnly: true });
+```
+
+Register `excelExport` in `SHGridProvider` before using Excel export. CSV export does not require
+that Enterprise module.
+
+## Policy and data security
+
+Bind the whole grid with the same vendor-neutral policy contract:
+
+```tsx
+<SHGrid policy={{ resource: 'records', action: 'list' }} columns={columns} rows={rows} rowId="id" />
+```
+
+A denied `hide` decision removes the grid from the UI. Regardless of UI policy, the backend must
+filter unauthorized rows and fields before returning `SHGridResult`; client-side column hiding is
+not a data-security boundary.
+
+## Enterprise modules
+
+| Feature               | Provider registration |
+| --------------------- | --------------------- |
+| Server-side row model | `serverSideRows`      |
+| Excel export          | `excelExport`         |
+| Row grouping          | `rowGrouping`         |
+
+Selective registration keeps unused Enterprise features out of consumer bundles and makes Tree
+Shaking verifiable.
