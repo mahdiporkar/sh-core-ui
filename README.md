@@ -91,6 +91,6 @@ This runs formatting, ESLint, strict TypeScript, Jest, Manifest checks, dual Web
 
 ## Documentation
 
-[Architecture](docs/architecture.md) · [Components](docs/component-support.md) · [Legacy migration](docs/legacy-migration.md) · [Manifests](docs/manifests.md) · [Security](docs/security-boundary.md) · [Grid](docs/grid.md) · [Localization](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [Contributing](docs/contributing.md)
+[Architecture](docs/architecture.md) · [Components](docs/component-support.md) · [Policy and permissions](docs/policy-manifest.md) · [Legacy migration](docs/legacy-migration.md) · [Manifests](docs/manifests.md) · [Security](docs/security-boundary.md) · [Grid](docs/grid.md) · [Localization](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [Contributing](docs/contributing.md)
 
 The project starts at `0.1.0`; `1.0.0` requires completion and stabilization of the wrapper inventory and Manifest schema.

@@ -39,6 +39,7 @@ function usePresentation(policy: SHButtonProps['policy']) {
       (result.behavior === 'disable' ||
         result.status === 'loading' ||
         result.status === 'missing' ||
+        result.status === 'notYetValid' ||
         result.status === 'expired'),
     readOnly: !result.allowed && result.behavior === 'readOnly',
   };

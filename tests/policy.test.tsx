@@ -49,4 +49,27 @@ describe('policy-aware components', () => {
     );
     expect(screen.getByRole('button')).toBeDisabled();
   });
+  test('selects the most specific matching contextual decision', () => {
+    const contextualManifest = {
+      ...manifest(false),
+      context: { tenant: 'north' },
+      decisions: [
+        { resource: 'thing', action: 'use', allowed: false },
+        {
+          resource: 'thing',
+          action: 'use',
+          allowed: true,
+          when: { tenant: 'north', channel: 'operations' },
+        },
+      ],
+    };
+    render(
+      <SHCoreProvider manifest={contextualManifest}>
+        <SHButton policy={{ resource: 'thing', action: 'use', context: { channel: 'operations' } }}>
+          Contextual action
+        </SHButton>
+      </SHCoreProvider>,
+    );
+    expect(screen.getByRole('button')).toBeEnabled();
+  });
 });

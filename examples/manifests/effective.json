@@ -1,10 +1,28 @@
 {
   "schemaVersion": "1.0",
   "version": "42",
+  "manifestId": "manifest-demo-42",
+  "issuer": "authorization-engine",
+  "audience": "sh-core-ui-demo",
+  "application": { "id": "example-app", "version": "1.0.0" },
+  "subject": { "id": "opaque-subject", "tenantId": "tenant-demo" },
   "issuedAt": "2026-01-01T00:00:00.000Z",
   "expiresAt": "2099-01-01T00:00:00.000Z",
+  "context": { "tenantId": "tenant-demo" },
+  "defaults": { "deniedBehavior": "disable" },
+  "cache": {
+    "refreshAfter": "2027-01-01T00:00:00.000Z",
+    "staleAt": "2098-01-01T00:00:00.000Z",
+    "etag": "manifest-demo-42"
+  },
   "decisions": [
     { "resource": "catalog.items", "action": "view", "allowed": true },
+    {
+      "resource": "catalog.items",
+      "action": "view",
+      "allowed": true,
+      "when": { "channel": "operations" }
+    },
     {
       "resource": "catalog.items",
       "action": "archive",

@@ -33,3 +33,7 @@ export interface SHManifestDiff {
   deprecated: readonly string[];
   breaking: readonly string[];
 }
+export interface SHEffectiveManifestLintOptions {
+  now?: Date;
+  allowExpired?: boolean;
+}

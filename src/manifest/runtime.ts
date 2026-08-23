@@ -1,9 +1,16 @@
 import Ajv2020 from 'ajv/dist/2020';
+import addFormats from 'ajv-formats';
 import definitionSchema from './schemas/definition-manifest.schema.json';
 import effectiveSchema from './schemas/effective-manifest.schema.json';
-import type { SHDefinitionManifest, SHManifestDiff, SHManifestValidationResult } from './types';
+import type {
+  SHDefinitionManifest,
+  SHEffectiveManifestLintOptions,
+  SHManifestDiff,
+  SHManifestValidationResult,
+} from './types';
 import type { SHEffectiveManifest } from '../core';
 const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
 const definitionValidator = ajv.compile(definitionSchema);
 const effectiveValidator = ajv.compile(effectiveSchema);
 const result = (
@@ -42,6 +49,48 @@ export function lintSHDefinitionManifest(
     const resource = manifest.resources.find((item) => item.key === route.resource);
     if (route.action && !resource?.actions.some((action) => action.key === route.action))
       errors.push(`unknown route action: ${route.resource ?? ''}/${route.action}`);
+  }
+  return { valid: errors.length === 0, errors };
+}
+const stableContext = (value: Record<string, unknown> | undefined): string =>
+  JSON.stringify(Object.entries(value ?? {}).sort(([left], [right]) => left.localeCompare(right)));
+export function lintSHEffectiveManifest(
+  manifest: SHEffectiveManifest,
+  options: SHEffectiveManifestLintOptions = {},
+): SHManifestValidationResult {
+  const errors: string[] = [];
+  const issuedAt = Date.parse(manifest.issuedAt);
+  const notBefore = manifest.notBefore ? Date.parse(manifest.notBefore) : undefined;
+  const expiresAt = manifest.expiresAt ? Date.parse(manifest.expiresAt) : undefined;
+  const refreshAfter = manifest.cache?.refreshAfter
+    ? Date.parse(manifest.cache.refreshAfter)
+    : undefined;
+  const staleAt = manifest.cache?.staleAt ? Date.parse(manifest.cache.staleAt) : undefined;
+  if (notBefore !== undefined && notBefore < issuedAt)
+    errors.push('notBefore must be at or after issuedAt');
+  if (expiresAt !== undefined && expiresAt <= issuedAt)
+    errors.push('expiresAt must be after issuedAt');
+  if (refreshAfter !== undefined && refreshAfter < issuedAt)
+    errors.push('cache.refreshAfter must be at or after issuedAt');
+  if (staleAt !== undefined && refreshAfter !== undefined && staleAt < refreshAfter)
+    errors.push('cache.staleAt must be at or after cache.refreshAfter');
+  if (expiresAt !== undefined && staleAt !== undefined && staleAt > expiresAt)
+    errors.push('cache.staleAt must not be after expiresAt');
+  if (
+    !options.allowExpired &&
+    expiresAt !== undefined &&
+    expiresAt <= (options.now ?? new Date()).getTime()
+  )
+    errors.push('manifest is expired');
+  const decisions = new Set<string>();
+  for (const decision of manifest.decisions) {
+    const key = `${decision.resource}/${decision.action}/${stableContext(decision.when)}`;
+    if (decisions.has(key)) errors.push(`duplicate effective decision: ${key}`);
+    decisions.add(key);
+    if (decision.allowed && decision.ui?.deniedBehavior)
+      errors.push(
+        `allowed decision must not define deniedBehavior: ${decision.resource}/${decision.action}`,
+      );
   }
   return { valid: errors.length === 0, errors };
 }

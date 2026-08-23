@@ -3,25 +3,37 @@ import type { SHLocalePack } from '../locales';
 import type { SHTheme } from '../tokens';
 
 export type SHDeniedBehavior = 'hide' | 'disable' | 'readOnly';
+export type SHPolicyContextValue = string | number | boolean | null;
+export type SHPolicyContext = Readonly<Record<string, SHPolicyContextValue>>;
 export interface SHPolicyBinding {
   resource: string;
   action: string;
-  context?: Record<string, unknown>;
+  context?: SHPolicyContext;
   pendingBehavior?: 'hide' | 'disable';
 }
 export interface SHEffectiveDecision {
   resource: string;
   action: string;
   allowed: boolean;
-  ui?: { deniedBehavior?: SHDeniedBehavior; reasonCode?: string };
+  /** Optional constraints. The most specific matching decision wins. */
+  when?: SHPolicyContext;
+  ui?: { deniedBehavior?: SHDeniedBehavior; reasonCode?: string; messageKey?: string };
 }
 export interface SHEffectiveManifest {
   schemaVersion: '1.0';
   version: string;
+  manifestId?: string;
+  issuer?: string;
+  audience?: string;
+  application?: { id: string; version?: string };
+  subject?: { id: string; tenantId?: string; sessionId?: string };
   issuedAt: string;
+  notBefore?: string;
   expiresAt?: string;
-  decisions: SHEffectiveDecision[];
-  cache?: { refreshAfter?: string; etag?: string };
+  context?: SHPolicyContext;
+  defaults?: { deniedBehavior?: SHDeniedBehavior };
+  decisions: readonly SHEffectiveDecision[];
+  cache?: { refreshAfter?: string; staleAt?: string; etag?: string };
 }
 export interface SHAuditEvent {
   type: string;

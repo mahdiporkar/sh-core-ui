@@ -92,7 +92,7 @@ npm run check
 
 ## الوثائق
 
-[البنية](docs/architecture.md) · [المكوّنات](docs/component-support.md) · [Manifest](docs/manifests.md) · [الأمان](docs/security-boundary.md) · [Grid](docs/grid.md) · [اللغة والسمات](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [المساهمة](docs/contributing.md)
+[البنية](docs/architecture.md) · [المكوّنات](docs/component-support.md) · [Policy والصلاحيات](docs/policy-manifest.ar.md) · [Manifest](docs/manifests.md) · [الأمان](docs/security-boundary.md) · [Grid](docs/grid.md) · [اللغة والسمات](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [المساهمة](docs/contributing.md)
 
 يبدأ المشروع بالإصدار `0.1.0`. يتطلب الوصول إلى `1.0.0` إكمال وتثبيت قائمة المكوّنات وschema الخاصة بالـ Manifest.
 

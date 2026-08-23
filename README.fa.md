@@ -92,7 +92,7 @@ npm run check
 
 ## مستندات
 
-[معماری](docs/architecture.md) · [کامپوننت‌ها](docs/component-support.md) · [Manifest](docs/manifests.md) · [امنیت](docs/security-boundary.md) · [Grid](docs/grid.md) · [زبان و تم](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [مشارکت](docs/contributing.md)
+[معماری](docs/architecture.md) · [کامپوننت‌ها](docs/component-support.md) · [Policy و Permission](docs/policy-manifest.fa.md) · [Manifest](docs/manifests.md) · [امنیت](docs/security-boundary.md) · [Grid](docs/grid.md) · [زبان و تم](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [مشارکت](docs/contributing.md)
 
 نسخهٔ توسعه از `0.1.0` آغاز می‌شود. رسیدن به `1.0.0` به تکمیل و تثبیت inventory کامپوننت‌ها و schema مانیفست وابسته است.
 

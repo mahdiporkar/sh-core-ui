@@ -2,7 +2,8 @@ import type { ReactElement, ReactNode } from 'react';
 import { useSHCore } from '../core';
 import type { SHDeniedBehavior, SHEffectiveDecision, SHPolicyBinding } from '../core';
 
-export type SHPolicyStatus = 'allowed' | 'denied' | 'loading' | 'missing' | 'expired';
+export type SHPolicyStatus =
+  'allowed' | 'denied' | 'loading' | 'missing' | 'notYetValid' | 'expired';
 export interface SHPolicyResult {
   status: SHPolicyStatus;
   allowed: boolean;
@@ -10,20 +11,41 @@ export interface SHPolicyResult {
   reasonCode?: string;
   decision?: SHEffectiveDecision;
 }
-const matchContext = (): boolean => true;
+const matchContext = (
+  required: SHEffectiveDecision['when'],
+  actual: SHPolicyBinding['context'],
+): boolean =>
+  !required || Object.entries(required).every(([key, value]) => Object.is(actual?.[key], value));
 export function useSHPolicy(binding?: SHPolicyBinding): SHPolicyResult {
   const { manifest, manifestLoading } = useSHCore();
   if (!binding) return { status: 'allowed', allowed: true, behavior: 'disable' };
   if (manifestLoading)
     return { status: 'loading', allowed: false, behavior: binding.pendingBehavior ?? 'disable' };
   if (!manifest) return { status: 'missing', allowed: false, behavior: 'disable' };
+  if (manifest.notBefore && Date.parse(manifest.notBefore) > Date.now())
+    return {
+      status: 'notYetValid',
+      allowed: false,
+      behavior: manifest.defaults?.deniedBehavior ?? 'disable',
+    };
   if (manifest.expiresAt && Date.parse(manifest.expiresAt) <= Date.now())
     return { status: 'expired', allowed: false, behavior: 'disable' };
-  const decision = manifest.decisions.find(
-    (item) =>
-      item.resource === binding.resource && item.action === binding.action && matchContext(),
-  );
-  if (!decision) return { status: 'missing', allowed: false, behavior: 'disable' };
+  const decision = manifest.decisions
+    .filter(
+      (item) =>
+        item.resource === binding.resource &&
+        item.action === binding.action &&
+        matchContext(item.when, { ...manifest.context, ...binding.context }),
+    )
+    .sort(
+      (left, right) => Object.keys(right.when ?? {}).length - Object.keys(left.when ?? {}).length,
+    )[0];
+  if (!decision)
+    return {
+      status: 'missing',
+      allowed: false,
+      behavior: manifest.defaults?.deniedBehavior ?? 'disable',
+    };
   const reasonCode = decision.ui?.reasonCode;
   return {
     status: decision.allowed ? 'allowed' : 'denied',

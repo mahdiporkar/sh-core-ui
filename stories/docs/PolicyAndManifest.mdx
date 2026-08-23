@@ -17,8 +17,16 @@ backend or authorization engine for one user/session and is the only Manifest in
 const effectiveManifest = {
   schemaVersion: '1.0',
   version: '2026-08-24.1',
+  manifestId: 'manifest-42',
+  issuer: 'authorization-engine',
+  audience: 'operations-web',
+  application: { id: 'operations-web', version: '3.4.0' },
+  subject: { id: 'opaque-subject', tenantId: 'tenant-north' },
   issuedAt: '2026-08-24T08:00:00.000Z',
+  notBefore: '2026-08-24T08:00:00.000Z',
   expiresAt: '2026-08-24T08:15:00.000Z',
+  context: { tenantId: 'tenant-north' },
+  defaults: { deniedBehavior: 'disable' },
   decisions: [
     {
       resource: 'orders',
@@ -30,6 +38,11 @@ const effectiveManifest = {
       },
     },
   ],
+  cache: {
+    refreshAfter: '2026-08-24T08:10:00.000Z',
+    staleAt: '2026-08-24T08:14:00.000Z',
+    etag: 'manifest-42',
+  },
 };
 ```
 
@@ -62,6 +75,7 @@ The pair `resource + action` must exactly match one Effective Manifest decision.
 | denied + `readOnly`          | Data-entry component is read-only; actions cannot execute |
 | missing Manifest or decision | Fail closed; component is disabled                        |
 | expired Manifest             | Fail closed; component is disabled                        |
+| future `notBefore`           | Fail closed; component is disabled                        |
 | `manifestLoading`            | Uses `pendingBehavior`, otherwise disabled                |
 
 Use the **lock toolbar** above the preview to switch between `allowed`, `hide`, `disable`,
@@ -101,6 +115,26 @@ Use `SHCan` for fragments and `SHRouteGuard` for route boundaries:
 4. Inject it into `SHCoreProvider` and set loading to false.
 5. Refresh according to `cache.refreshAfter`, session changes, or authorization events.
 6. Treat missing, invalid, and expired data as denied.
+
+## Context-specific decisions
+
+An optional `when` object limits a decision to scalar context values. Manifest context and component
+context are merged, and the most specific matching decision wins:
+
+```tsx
+<SHButton
+  policy={{
+    resource: 'orders',
+    action: 'export',
+    context: { channel: 'operations' },
+  }}
+>
+  Export
+</SHButton>
+```
+
+Use an unconstrained decision as fallback. Identical `resource + action + when` combinations are
+invalid because resolution must never depend on array order.
 
 ## Security rule
 

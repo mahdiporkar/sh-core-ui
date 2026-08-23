@@ -10,7 +10,27 @@ const schemaFor = async (manifest) =>
       ? 'src/manifest/schemas/effective-manifest.schema.json'
       : 'src/manifest/schemas/definition-manifest.schema.json',
   );
-const lint = (manifest) => {
+const stableContext = (value = {}) =>
+  JSON.stringify(Object.entries(value).sort(([left], [right]) => left.localeCompare(right)));
+const lintEffective = (manifest) => {
+  const errors = [];
+  const issuedAt = Date.parse(manifest.issuedAt);
+  const expiresAt = manifest.expiresAt ? Date.parse(manifest.expiresAt) : undefined;
+  if (expiresAt !== undefined && expiresAt <= issuedAt)
+    errors.push('expiresAt must be after issuedAt');
+  const decisions = new Set();
+  for (const decision of manifest.decisions) {
+    const key = `${decision.resource}/${decision.action}/${stableContext(decision.when)}`;
+    if (decisions.has(key)) errors.push(`duplicate effective decision: ${key}`);
+    decisions.add(key);
+    if (decision.allowed && decision.ui?.deniedBehavior)
+      errors.push(
+        `allowed decision must not define deniedBehavior: ${decision.resource}/${decision.action}`,
+      );
+  }
+  return errors;
+};
+const lintDefinition = (manifest) => {
   const errors = [];
   const keys = new Set();
   for (const resource of manifest.resources) {
@@ -46,7 +66,8 @@ if (command === 'validate') {
   }
 } else if (command === 'lint') {
   for (const file of files) {
-    const errors = lint(await read(file));
+    const manifest = await read(file);
+    const errors = manifest.decisions ? lintEffective(manifest) : lintDefinition(manifest);
     if (errors.length) {
       console.error(file, errors);
       process.exitCode = 1;
