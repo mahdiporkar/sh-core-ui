@@ -72,7 +72,7 @@ const preview: Preview = {
     a11y: { test: 'error' },
     layout: 'padded',
     options: {
-      storySort: { order: ['Welcome', 'Foundations', 'Components', 'Architecture'] },
+      storySort: { order: ['Welcome', 'Foundations', 'Components', 'Grid', 'Architecture'] },
     },
   },
 };

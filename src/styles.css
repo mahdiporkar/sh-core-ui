@@ -14,11 +14,21 @@
   opacity: 0.8;
 }
 .sh-grid {
+  block-size: var(--sh-grid-block-size, 32rem);
   min-block-size: 12rem;
 }
 .sh-grid__state {
   display: grid;
+  gap: 0.75rem;
   min-block-size: 8rem;
   place-items: center;
   color: var(--sh-text-muted);
+}
+.sh-grid__state button {
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--sh-border);
+  border-radius: 0.5rem;
+  color: var(--sh-text);
+  background: var(--sh-surface);
+  cursor: pointer;
 }

@@ -12,13 +12,16 @@ export const AGGridAdapter = forwardRef(function AGGridAdapter<T extends object>
     rowId,
     pageSize = 50,
     selectable,
+    emptyContent,
+    errorContent,
+    loadingContent,
     className,
     onSelectionChange,
     onError,
   }: SHGridProps<T>,
   ref: React.ForwardedRef<SHGridRef>,
 ) {
-  const { locale } = useSHCore();
+  const { locale, t } = useSHCore();
   const apiRef = useRef<GridApi<T> | null>(null);
   const [loadedRows, setLoadedRows] = useState<readonly T[]>(rows);
   const [loading, setLoading] = useState(Boolean(dataSource));
@@ -111,13 +114,22 @@ export const AGGridAdapter = forwardRef(function AGGridAdapter<T extends object>
   };
   const onSelectionChanged = (event: SelectionChangedEvent<T>) =>
     onSelectionChange?.(event.api.getSelectedRows());
-  if (error)
+  if (error) {
+    if (errorContent) return <>{errorContent(error, load)}</>;
     return (
       <div className="sh-grid__state" role="alert">
         {error.message}
         <button type="button" onClick={load}>
-          Retry
+          {t('common.retry')}
         </button>
+      </div>
+    );
+  }
+  if (loading && loadingContent) return <>{loadingContent}</>;
+  if (!loading && loadedRows.length === 0)
+    return (
+      <div className="sh-grid__state" role="status">
+        {emptyContent ?? t('common.empty')}
       </div>
     );
   return (
