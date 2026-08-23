@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "version": "42",
+  "issuedAt": "2026-01-01T00:00:00.000Z",
+  "expiresAt": "2099-01-01T00:00:00.000Z",
+  "decisions": [
+    { "resource": "catalog.items", "action": "view", "allowed": true },
+    {
+      "resource": "catalog.items",
+      "action": "archive",
+      "allowed": false,
+      "ui": { "deniedBehavior": "hide", "reasonCode": "not_available" }
+    }
+  ]
+}

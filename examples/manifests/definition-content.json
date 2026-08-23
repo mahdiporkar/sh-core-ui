@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0",
+  "application": { "id": "content-example", "version": "1.0.0" },
+  "resources": [
+    {
+      "key": "content.entries",
+      "actions": [{ "key": "read" }, { "key": "schedule" }, { "key": "assign" }]
+    }
+  ]
+}

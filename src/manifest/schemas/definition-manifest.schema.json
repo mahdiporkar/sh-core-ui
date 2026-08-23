@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sh-core-ui.dev/schemas/definition-manifest-1.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "application", "resources"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "microFrontend": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": { "name": { "type": "string" }, "entry": { "type": "string" } }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "actions"],
+        "properties": {
+          "key": { "type": "string", "minLength": 1 },
+          "type": { "type": "string" },
+          "parent": { "type": "string" },
+          "metadata": { "type": "object" },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["key"],
+              "properties": {
+                "key": { "type": "string", "minLength": 1 },
+                "deprecated": { "type": "boolean" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path"],
+        "properties": {
+          "id": { "type": "string" },
+          "path": { "type": "string" },
+          "resource": { "type": "string" },
+          "action": { "type": "string" },
+          "parent": { "type": "string" },
+          "navigation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["labelKey"],
+            "properties": { "labelKey": { "type": "string" }, "order": { "type": "number" } }
+          }
+        }
+      }
+    }
+  }
+}

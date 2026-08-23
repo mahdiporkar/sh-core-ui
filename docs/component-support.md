@@ -1,0 +1,15 @@
+# Ant Design component support matrix
+
+Installed adapter baseline: Ant Design 5.x. The matrix is explicit; unchecked items are tracked gaps, not implied support.
+
+| Category     | Ant Design public components                                                                                                                                                 | SH status                                                                   |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| General      | Button, Typography                                                                                                                                                           | `SHButton` implemented; Typography planned                                  |
+| Layout       | Divider, Flex, Grid, Layout, Space                                                                                                                                           | planned                                                                     |
+| Navigation   | Anchor, Breadcrumb, Dropdown, Menu, Pagination, Steps                                                                                                                        | planned                                                                     |
+| Data entry   | AutoComplete, Cascader, Checkbox, ColorPicker, DatePicker, Form, Input, InputNumber, Mentions, Radio, Rate, Select, Slider, Switch, TimePicker, Transfer, TreeSelect, Upload | `SHInput`, `SHSelect`, `SHCheckbox`, `SHSwitch` implemented; others planned |
+| Data display | Avatar, Badge, Calendar, Card, Carousel, Collapse, Descriptions, Empty, Image, List, Popover, QRCode, Segmented, Statistic, Table, Tabs, Tag, Timeline, Tooltip, Tour, Tree  | `SHCard`, `SHTable`, `SHTabs` implemented; others planned                   |
+| Feedback     | Alert, Drawer, Message, Modal, Notification, Popconfirm, Progress, Result, Skeleton, Spin                                                                                    | `SHAlert`, `SHModal` implemented; others planned                            |
+| Utility      | Affix, App, ConfigProvider, FloatButton, Watermark                                                                                                                           | `ConfigProvider` internal only; others planned                              |
+
+Each planned wrapper requires an organization-owned semantic contract, adapter mapping, policy behavior where meaningful, tests, accessibility review, and stories before its status changes. `SHTable` is for ordinary tables; `SHGrid` is the generic high-volume enterprise grid.

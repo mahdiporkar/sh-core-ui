@@ -1,0 +1,8 @@
+node_modules/
+dist/
+storybook-static/
+coverage/
+fixtures/*/dist/
+*.log
+.env*
+!.env.example

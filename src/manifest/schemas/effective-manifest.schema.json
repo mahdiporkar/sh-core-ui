@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sh-core-ui.dev/schemas/effective-manifest-1.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "version", "issuedAt", "decisions"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "version": { "type": "string", "minLength": 1 },
+    "issuedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["resource", "action", "allowed"],
+        "properties": {
+          "resource": { "type": "string", "minLength": 1 },
+          "action": { "type": "string", "minLength": 1 },
+          "allowed": { "type": "boolean" },
+          "ui": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "deniedBehavior": { "enum": ["hide", "disable", "readOnly"] },
+              "reasonCode": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refreshAfter": { "type": "string", "format": "date-time" },
+        "etag": { "type": "string" }
+      }
+    }
+  }
+}

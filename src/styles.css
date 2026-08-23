@@ -1,0 +1,24 @@
+.sh-root {
+  color: var(--sh-text);
+  background: var(--sh-surface);
+  font-family: system-ui, sans-serif;
+}
+.sh-access-denied {
+  padding: 1rem;
+  border: 1px solid var(--sh-border);
+  border-radius: 0.5rem;
+  color: var(--sh-error);
+}
+.sh-readonly {
+  cursor: default;
+  opacity: 0.8;
+}
+.sh-grid {
+  min-block-size: 12rem;
+}
+.sh-grid__state {
+  display: grid;
+  min-block-size: 8rem;
+  place-items: center;
+  color: var(--sh-text-muted);
+}

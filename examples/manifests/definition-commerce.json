@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "application": { "id": "catalog-example", "version": "1.0.0" },
+  "resources": [
+    {
+      "key": "catalog.items",
+      "type": "collection",
+      "actions": [{ "key": "view" }, { "key": "publish" }, { "key": "archive" }]
+    }
+  ],
+  "routes": [
+    {
+      "id": "items",
+      "path": "/items",
+      "resource": "catalog.items",
+      "action": "view",
+      "navigation": { "labelKey": "nav.items" }
+    }
+  ]
+}
