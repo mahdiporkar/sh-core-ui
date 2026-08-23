@@ -25,6 +25,7 @@ Vendor-neutral React components, Manifest-driven UX, enterprise grids, multiling
 
 - Organization-owned, vendor-neutral `SH*` component contracts.
 - Generic `SHGrid<T>` backed by an isolated AG Grid Enterprise adapter.
+- Config-driven `SHForm`, async `SHSelect`, and context-aware `SHNotification` APIs.
 - Effective Manifest behaviors: `hide`, `disable`, and `readOnly`.
 - Typed primitive, semantic, and component Design Tokens.
 - English, Persian, and Arabic locale packs with runtime RTL/LTR switching.
@@ -90,6 +91,6 @@ This runs formatting, ESLint, strict TypeScript, Jest, Manifest checks, dual Web
 
 ## Documentation
 
-[Architecture](docs/architecture.md) · [Components](docs/component-support.md) · [Manifests](docs/manifests.md) · [Security](docs/security-boundary.md) · [Grid](docs/grid.md) · [Localization](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [Contributing](docs/contributing.md)
+[Architecture](docs/architecture.md) · [Components](docs/component-support.md) · [Legacy migration](docs/legacy-migration.md) · [Manifests](docs/manifests.md) · [Security](docs/security-boundary.md) · [Grid](docs/grid.md) · [Localization](docs/localization-theming.md) · [Tree Shaking](docs/tree-shaking.md) · [Contributing](docs/contributing.md)
 
 The project starts at `0.1.0`; `1.0.0` requires completion and stabilization of the wrapper inventory and Manifest schema.

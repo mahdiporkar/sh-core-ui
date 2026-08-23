@@ -14,6 +14,7 @@ export default tseslint.config(
       'scripts/**',
       'fixtures/**',
       'tests/**/*.cjs',
+      'shaparak-core-ui/**',
     ],
   },
   js.configs.recommended,

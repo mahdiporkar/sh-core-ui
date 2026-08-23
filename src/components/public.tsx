@@ -12,6 +12,8 @@ import {
   AntTabsAdapter,
 } from '../adapters/antd/components';
 import { useSHPolicy } from '../policy';
+import { AntFormAdapter } from '../adapters/antd/form';
+import { AntNotificationAdapter } from '../adapters/antd/notification';
 import type {
   SHAlertProps,
   SHButtonProps,
@@ -19,7 +21,9 @@ import type {
   SHCheckboxProps,
   SHInputProps,
   SHInputRef,
+  SHFormProps,
   SHModalProps,
+  SHNotificationProps,
   SHSelectProps,
   SHSwitchProps,
   SHTableProps,
@@ -133,4 +137,21 @@ export function SHTable<T extends object>({ policy, columns, ...props }: SHTable
   const state = usePresentation(policy);
   if (state.hidden) return null;
   return <AntTableAdapter<T> {...props} columns={columns} />;
+}
+
+export function SHForm({ policy, ...props }: SHFormProps) {
+  const state = usePresentation(policy);
+  if (state.hidden) return null;
+  return (
+    <AntFormAdapter
+      {...props}
+      disabled={props.disabled || state.disabled}
+      readOnly={props.readOnly || state.readOnly}
+    />
+  );
+}
+
+/** Hosts the context-aware notification API returned by useSHNotification. */
+export function SHNotification(props: SHNotificationProps) {
+  return <AntNotificationAdapter {...props} />;
 }

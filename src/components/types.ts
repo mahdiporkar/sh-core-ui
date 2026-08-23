@@ -42,21 +42,108 @@ export interface SHInputProps extends SHBaseProps {
   onKeyDown?: (event: KeyboardEvent) => void;
 }
 export interface SHSelectOption {
-  value: string;
+  value: string | number;
   label: ReactNode;
   disabled?: boolean;
 }
-export interface SHSelectProps extends SHBaseProps {
-  value?: string;
-  defaultValue?: string;
+export interface SHSelectLoadContext {
+  cursor?: string;
+  signal: AbortSignal;
+}
+export interface SHSelectLoadResult {
   options: readonly SHSelectOption[];
+  nextCursor?: string;
+}
+export interface SHSelectProps extends SHBaseProps {
+  value?: string | number | readonly (string | number)[];
+  defaultValue?: string | number | readonly (string | number)[];
+  options?: readonly SHSelectOption[];
   placeholder?: string;
   label?: string;
   disabled?: boolean;
   readOnly?: boolean;
   loading?: boolean;
   clearable?: boolean;
-  onChange?: (value: string | undefined) => void;
+  searchable?: boolean;
+  multiple?: boolean;
+  debounceMs?: number;
+  loadOptions?: (search: string, context: SHSelectLoadContext) => Promise<SHSelectLoadResult>;
+  onSearch?: (search: string) => void;
+  onLoadError?: (error: Error) => void;
+  onChange?: (value: string | number | readonly (string | number)[] | undefined) => void;
+}
+
+export type SHFormValue = string | number | boolean | readonly (string | number)[] | undefined;
+export type SHFormValues = Record<string, SHFormValue>;
+export interface SHFormValidationRule {
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: RegExp;
+  message?: string;
+  validate?: (
+    value: SHFormValue,
+    values: SHFormValues,
+  ) => string | undefined | Promise<string | undefined>;
+}
+export interface SHFormFieldDefinition {
+  name: string;
+  label: ReactNode;
+  kind: 'input' | 'multiline' | 'select' | 'checkbox' | 'custom';
+  placeholder?: string;
+  options?: readonly SHSelectOption[];
+  rules?: readonly SHFormValidationRule[];
+  disabled?: boolean;
+  readOnly?: boolean;
+  hidden?: boolean;
+  policy?: SHPolicyBinding;
+  render?: (value: SHFormValue, setValue: (value: SHFormValue) => void) => ReactNode;
+}
+export interface SHFormProps extends SHBaseProps {
+  name: string;
+  fields?: readonly SHFormFieldDefinition[];
+  children?: ReactNode;
+  initialValues?: SHFormValues;
+  values?: SHFormValues;
+  layout?: 'vertical' | 'horizontal' | 'inline';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  readOnly?: boolean;
+  showRequiredMark?: boolean;
+  onValuesChange?: (changed: SHFormValues, values: SHFormValues) => void;
+  onSubmit?: (values: SHFormValues) => void | Promise<void>;
+  onSubmitFailed?: (errors: readonly { name: string; messages: readonly string[] }[]) => void;
+}
+
+export type SHNotificationTone = 'success' | 'info' | 'warning' | 'error';
+export type SHNotificationPlacement =
+  'top' | 'topStart' | 'topEnd' | 'bottom' | 'bottomStart' | 'bottomEnd';
+export interface SHNotificationOptions {
+  id?: string;
+  title: ReactNode;
+  description?: ReactNode;
+  tone?: SHNotificationTone;
+  durationMs?: number;
+  placement?: SHNotificationPlacement;
+  role?: 'alert' | 'status';
+  action?: ReactNode;
+  closable?: boolean;
+  onClick?: () => void;
+  onClose?: () => void;
+}
+export interface SHNotificationApi {
+  open(options: SHNotificationOptions): void;
+  success(options: Omit<SHNotificationOptions, 'tone'>): void;
+  info(options: Omit<SHNotificationOptions, 'tone'>): void;
+  warning(options: Omit<SHNotificationOptions, 'tone'>): void;
+  error(options: Omit<SHNotificationOptions, 'tone'>): void;
+  close(id: string): void;
+  closeAll(): void;
+}
+export interface SHNotificationProps {
+  children: ReactNode;
+  maxVisible?: number;
+  defaultPlacement?: SHNotificationPlacement;
 }
 export interface SHCheckboxProps extends SHBaseProps {
   checked?: boolean;

@@ -5,9 +5,12 @@ import {
   Card,
   Checkbox,
   ConfigProvider,
+  Divider,
   Input,
   Modal,
   Select,
+  Space,
+  Spin,
   Switch,
   Table,
   Tabs,
@@ -22,6 +25,7 @@ import type {
   SHInputProps,
   SHInputRef,
   SHModalProps,
+  SHSelectOption,
   SHSelectProps,
   SHSwitchProps,
   SHTableProps,
@@ -109,16 +113,104 @@ export const AntInputAdapter = forwardRef<SHInputRef, SHInputProps>(function Ant
     </SHAntBoundary>
   );
 });
-export function AntSelectAdapter({ options, label, testId, ...props }: SHSelectProps) {
+export function AntSelectAdapter({
+  options = [],
+  label,
+  testId,
+  loadOptions,
+  debounceMs = 400,
+  onSearch,
+  onLoadError,
+  multiple,
+  searchable,
+  clearable,
+  readOnly,
+  onChange,
+  ...props
+}: SHSelectProps) {
+  const { t } = useSHCore();
+  const [remoteOptions, setRemoteOptions] = React.useState<readonly SHSelectOption[]>(options);
+  const [loading, setLoading] = React.useState(false);
+  const [nextCursor, setNextCursor] = React.useState<string>();
+  const searchRef = React.useRef('');
+  const requestRef = React.useRef<AbortController | undefined>(undefined);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  React.useEffect(() => {
+    if (!loadOptions) setRemoteOptions(options);
+  }, [loadOptions, options]);
+  React.useEffect(
+    () => () => {
+      requestRef.current?.abort();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    },
+    [],
+  );
+  const fetchRemote = React.useCallback(
+    async (search: string, cursor?: string, append = false) => {
+      if (!loadOptions) return;
+      requestRef.current?.abort();
+      const controller = new AbortController();
+      requestRef.current = controller;
+      setLoading(true);
+      try {
+        const result = await loadOptions(search, { cursor, signal: controller.signal });
+        if (controller.signal.aborted) return;
+        setRemoteOptions((current) => (append ? [...current, ...result.options] : result.options));
+        setNextCursor(result.nextCursor);
+      } catch (reason: unknown) {
+        if (controller.signal.aborted) return;
+        onLoadError?.(reason instanceof Error ? reason : new Error(t('common.loadError')));
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    },
+    [loadOptions, onLoadError, t],
+  );
+  const handleSearch = (search: string) => {
+    searchRef.current = search;
+    onSearch?.(search);
+    if (!loadOptions) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => void fetchRemote(search), debounceMs);
+  };
   return (
     <SHAntBoundary>
       <label>
         {label && <span>{label}</span>}
         <Select
           data-testid={testId}
-          options={[...options]}
+          options={[...remoteOptions]}
           {...props}
-          allowClear={props.clearable}
+          value={props.value}
+          defaultValue={props.defaultValue}
+          mode={multiple ? 'multiple' : undefined}
+          showSearch={searchable || Boolean(loadOptions)}
+          filterOption={loadOptions ? false : undefined}
+          onSearch={searchable || loadOptions ? handleSearch : undefined}
+          onChange={(value) => onChange?.(value)}
+          loading={props.loading || loading}
+          disabled={props.disabled || readOnly}
+          allowClear={clearable}
+          notFoundContent={loading ? <Spin size="small" /> : undefined}
+          popupRender={(menu) => (
+            <>
+              {menu}
+              {loadOptions && nextCursor && (
+                <>
+                  <Divider style={{ margin: '0.5rem 0' }} />
+                  <Space style={{ paddingInline: '0.5rem', paddingBlockEnd: '0.25rem' }}>
+                    <Button
+                      type="text"
+                      loading={loading}
+                      onClick={() => void fetchRemote(searchRef.current, nextCursor, true)}
+                    >
+                      {t('common.loadMore')}
+                    </Button>
+                  </Space>
+                </>
+              )}
+            </>
+          )}
         />
       </label>
     </SHAntBoundary>

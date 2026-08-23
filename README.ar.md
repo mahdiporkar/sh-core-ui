@@ -26,6 +26,7 @@
 
 - عقود `SH*` مملوكة للمؤسسة ومستقلة عن المورّد.
 - `SHGrid<T>` عامة عبر adapter معزول لـ AG Grid Enterprise.
+- واجهات مستقلة عن المورّد لـ `SHForm` القابل للتهيئة و`SHSelect` غير المتزامن و`SHNotification` المعتمد على السياق.
 - سلوكيات `hide` و`disable` و`readOnly` عبر Effective Manifest.
 - Design Tokens مكتوبة الأنواع على ثلاثة مستويات.
 - الإنجليزية والفارسية والعربية مع تبديل RTL/LTR أثناء التشغيل.

@@ -26,6 +26,7 @@
 
 - APIهای `SH*` متعلق به سازمان و مستقل از vendor.
 - `SHGrid<T>` عمومی با adapter ایزولهٔ AG Grid Enterprise.
+- APIهای مستقل از vendor برای `SHForm` پیکربندی‌محور، `SHSelect` غیرهمزمان و `SHNotification` مبتنی بر context.
 - رفتارهای `hide`، `disable` و `readOnly` مبتنی بر Effective Manifest.
 - Design Tokenهای typed در سه سطح primitive، semantic و component.
 - زبان‌های فارسی، انگلیسی و عربی با تغییر runtime جهت RTL/LTR.

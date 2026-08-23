@@ -72,10 +72,12 @@ export interface SHGridProps<T extends object> {
   columns: readonly SHGridColumn<T>[];
   rows?: readonly T[];
   dataSource?: SHGridDataSource<T>;
+  dataMode?: 'client' | 'server';
   rowId: keyof T | ((row: T) => string);
   actions?: readonly SHGridAction<T>[];
   policy?: SHPolicyBinding;
   pageSize?: number;
+  pageSizeOptions?: readonly number[];
   selectable?: boolean;
   emptyContent?: ReactNode;
   errorContent?: (error: Error, retry: () => void) => ReactNode;

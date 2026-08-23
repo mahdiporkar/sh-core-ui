@@ -148,7 +148,7 @@ function GridDemo({
     [data, remote],
   );
   return (
-    <SHGridProvider>
+    <SHGridProvider enterpriseFeatures={remote ? ['serverSideRows'] : []}>
       <p aria-live="polite">
         <strong>{selected.length}</strong> selected · switch locale, direction, density, and theme
         from the toolbar.
@@ -157,6 +157,7 @@ function GridDemo({
         columns={columns}
         rows={remote ? undefined : data}
         dataSource={dataSource}
+        dataMode={remote ? 'server' : 'client'}
         rowId="id"
         pageSize={4}
         selectable
