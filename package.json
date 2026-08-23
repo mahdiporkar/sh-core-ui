@@ -13,6 +13,8 @@
   "files": [
     "dist",
     "README.md",
+    "README.fa.md",
+    "README.ar.md",
     "LICENSE"
   ],
   "exports": {

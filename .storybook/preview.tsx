@@ -16,6 +16,11 @@ const preview: Preview = {
       defaultValue: 'en-US',
       toolbar: { icon: 'globe', items: ['en-US', 'fa-IR', 'ar'] },
     },
+    density: {
+      description: 'Interface density',
+      defaultValue: 'comfortable',
+      toolbar: { icon: 'component', items: ['comfortable', 'compact'] },
+    },
     policy: {
       description: 'Effective decision',
       defaultValue: 'allowed',
@@ -47,9 +52,13 @@ const preview: Preview = {
                 },
               ],
             };
+      const selectedTheme =
+        context.globals.density === 'compact'
+          ? themes.compact
+          : themes[context.globals.theme as keyof typeof themes];
       return (
         <SHCoreProvider
-          theme={themes[context.globals.theme as keyof typeof themes]}
+          theme={selectedTheme}
           locale={builtinLocales[context.globals.locale as keyof typeof builtinLocales]}
           manifest={manifest}
         >
@@ -58,6 +67,13 @@ const preview: Preview = {
       );
     },
   ],
-  parameters: { controls: { expanded: true }, a11y: { test: 'error' }, layout: 'padded' },
+  parameters: {
+    controls: { expanded: true },
+    a11y: { test: 'error' },
+    layout: 'padded',
+    options: {
+      storySort: { order: ['Welcome', 'Foundations', 'Components', 'Architecture'] },
+    },
+  },
 };
 export default preview;
